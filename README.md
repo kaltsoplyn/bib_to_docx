@@ -1,4 +1,4 @@
-# bib-to-docx
+# A simple python bib-to-docx parser
 
 Like the title says:   
 takes a bib-tex bibliography file as input, and outputs a formatted docx file.
