@@ -10,7 +10,7 @@ from bib_to_dict import BibToDictList, BibRecord
 bib_in = BibToDictList('bib_in.bib')
 records = bib_in.records
 
-# function to gather info from one record -> returns a dict
+# function to gather info from one BibRecord -> returns a dict
 def build_rec(rec):
     out = {
         "title": rec.get_tag('title'),
