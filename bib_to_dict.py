@@ -49,6 +49,9 @@ def import_bib(filename):
 
         # convert records to json, after a ridiculous amount of reg exp substitutions
         for i in range(len(records)):
+            records[i] = re.sub(r'Abstract =[\w\W\d\s]*?},', r'', records[i])
+            records[i] = re.sub(r'Funding-Ack[\w\W\d\s]*?},', r'', records[i])
+            records[i] = re.sub(r'Funding-Text[\w\W\d\s]*?},', r'', records[i])
             records[i] = re.sub("}}", "}", re.sub("{{", "{", records[i]) )   # convert double {{, }} to single {, }
             records[i] = re.sub(r'ISI:[\d\w]*?,', r'"ref_id" : "' + str(i + 1) + '", ', records[i])   # remove the ISI entry at the beginning / replace it with an id
             records[i] = re.sub(r'\n([\w\-\s]+?) = ', lambda pat: '"' +  pat.group(1).lower() + '" :', records[i])   # parse keys from e.g. ' Author = ' to ' "author" : '
@@ -57,7 +60,11 @@ def import_bib(filename):
             records[i] = re.sub(r'{(.*?)}', r'"\1"', records[i])   # substitute {field} with "field"
             records[i] = re.sub(r'\\', r'\\\\', records[i])   # escape possible backslashes \
             records[i] = re.sub(r'<<<', r'{', re.sub(r'>>>', r'}', records[i]))   # go back from <<<, >>> to {, }
-            records[i] = json.loads(records[i])   # now each record should be in json string format > parse into dicts
+            try:
+                records[i] = json.loads(records[i])   # now each record should be in json string format > parse into dicts
+            except json.decoder.JSONDecodeError as e:
+                print("JSON Error at index {}: {}".format(i, e))
+                records[i] = {"Title": "JSON Error at index {}: {}".format(i, e), "Author": "json.decoder.jsonDecoderError"}
 
         # homogenize titles into .title() format
         for rec in records:
