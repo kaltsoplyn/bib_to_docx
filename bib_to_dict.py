@@ -51,7 +51,7 @@ def import_bib(filename):
         for i in range(len(records)):
             records[i] = re.sub(r'Abstract =[\w\W\d\s]*?},', r'', records[i])
             records[i] = re.sub(r'Funding-Ack[\w\W\d\s]*?},', r'', records[i])
-            records[i] = re.sub(r'Funding-Text[\w\W\d\s]*?},', r'', records[i])
+            records[i] = re.sub(r'Funding-Text[\w\W\d\s]*?}},', r'', records[i])
             records[i] = re.sub("}}", "}", re.sub("{{", "{", records[i]) )   # convert double {{, }} to single {, }
             records[i] = re.sub(r'ISI:[\d\w]*?,', r'"ref_id" : "' + str(i + 1) + '", ', records[i])   # remove the ISI entry at the beginning / replace it with an id
             records[i] = re.sub(r'\n([\w\-\s]+?) = ', lambda pat: '"' +  pat.group(1).lower() + '" :', records[i])   # parse keys from e.g. ' Author = ' to ' "author" : '

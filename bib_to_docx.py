@@ -38,11 +38,12 @@ document.add_heading('Bibliography', 0)
 # USAGE: new_style( style name: string, font_size: int pt, kw:is_bold: bool, kwarg: is_italic: bool, kw: left_ind: float cm, kw: first_line_ind: float cm )
 # pretty self explanatory except: left_ind is left_indent = how much indent from the left in cm
 # the first_line_ind defines how much the first line is indented *RELATIVE* to the rest (aka relative to left_ind)
-def new_style( name, font_size, is_bold = False, is_italic = False, left_ind = 0.5, first_line_ind = 0 ):
+def new_style( name, font_size, is_bold = False, is_italic = False, left_ind = 0.5, first_line_ind = 0, color = MSO_THEME_COLOR_INDEX.TEXT_1  ):
     style = document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
     style.font.bold = is_bold
     style.font.italic = is_italic
     style.font.size = Pt(font_size)
+    style.font.color.theme_color = color
     paragraph_format = style.paragraph_format
     paragraph_format.first_line_indent = Cm(first_line_ind)
     paragraph_format.left_indent = Cm(left_ind)
@@ -53,8 +54,8 @@ def new_style( name, font_size, is_bold = False, is_italic = False, left_ind = 0
 # define styles
 # the "DD" styles are defined with larger indents so that things align nicely when the index is > 10
 # I duplicated the whole style in code, because my attempt to copy or deepcopy the styles and change just the indent failed for some reason
-title_style = new_style('title_style', 13, is_bold=True, first_line_ind=-0.5)
-title_styleDD = new_style('title_styleDD', 13, is_bold=True, left_ind=0.75, first_line_ind=-0.75)
+title_style = new_style('title_style', 13, is_bold=True, first_line_ind=-0.5, color = MSO_THEME_COLOR_INDEX.ACCENT_1 )
+title_styleDD = new_style('title_styleDD', 13, is_bold=True, left_ind=0.75, first_line_ind=-0.75, color = MSO_THEME_COLOR_INDEX.ACCENT_1 )
 authors_style = new_style('authors_style', 12, is_italic=True)
 authors_styleDD = new_style('authors_styleDD', 12, is_italic=True, left_ind=0.75)
 journal_style = new_style('journal_style', 11)
