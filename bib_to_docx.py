@@ -80,9 +80,6 @@ authors_style = new_style('authors_style', 11, is_italic=True)
 authors_styleDD = new_style('authors_styleDD', 11, is_italic=True, left_ind=0.5)
 journal_style = new_style('journal_style', 11)
 journal_styleDD = new_style('journal_styleDD', 11, left_ind=0.5)
-OA_styleGold = new_style('OA_style_Gold', 11, font_name = 'Segoe UI Symbol', color = Colors["Gold"])
-OA_styleGreen = new_style('OA_style_Green', 11, font_name = 'Segoe UI Symbol', color = Colors["Green"])
-OA_styleGray = new_style('OA_style_Gray', 11, font_name = 'Segoe UI Symbol', color = Colors["Gray"])
 
 
 # copy-pasted function to add hyperlinks, as, strangely, there is no direct way through the API
@@ -125,8 +122,8 @@ def build_entry(index, r):
     title.add_run(str(index + 1) + ". " + r['title'] + "  ")
     
     if (r['oa'] == ''):
-        OAcolor = Colors["Gray"]
         OAdecorator = '🔒'
+        OAcolor = Colors["Gray"]
     else:
         OAdecorator = '🔓'
         OAcolor = Colors["Gold"] if r['oa'] == 'gold' else Colors["Green"]
