@@ -52,10 +52,13 @@ def import_bib(filename):
             records[i] = re.sub(r'Abstract =[\w\W\d\s]*?},', r'', records[i])
             records[i] = re.sub(r'Funding-Ack[\w\W\d\s]*?},', r'', records[i])
             records[i] = re.sub(r'Funding-Text[\w\W\d\s]*?}},', r'', records[i])
+            records[i] = re.sub("{\[}", "[", re.sub("{\]}", "]", records[i]) )   # convert double stupid {[} and {]}, to [, ]
             records[i] = re.sub("}}", "}", re.sub("{{", "{", records[i]) )   # convert double {{, }} to single {, }
             records[i] = re.sub(r'ISI:[\d\w]*?,', r'"ref_id" : "' + str(i + 1) + '", ', records[i])   # remove the ISI entry at the beginning / replace it with an id
+            records[i] = re.sub(r'WOS:[\d\w]*?,', r'"ref_id" : "' + str(i + 1) + '", ', records[i])   # remove the WOS entry at the beginning / replace it with an id
             records[i] = re.sub(r'\n([\w\-\s]+?) = ', lambda pat: '"' +  pat.group(1).lower() + '" :', records[i])   # parse keys from e.g. ' Author = ' to ' "author" : '
             records[i] = re.sub(r',\n}', r'>>>', re.sub(r'@article{', r'<<<', records[i]))   # enclose whole object in distinct <<<, >>> instead of {, }
+            records[i] = re.sub(r',\n}', r'>>>', re.sub(r'@incollection{', r'<<<', records[i]))   # enclose whole object in distinct <<<, >>> instead of {, }
             records[i] = re.sub(r'\n', r' ', records[i])   # remove newlines
             records[i] = re.sub(r'{(.*?)}', r'"\1"', records[i])   # substitute {field} with "field"
             records[i] = re.sub(r'\\', r'\\\\', records[i])   # escape possible backslashes \
@@ -63,7 +66,8 @@ def import_bib(filename):
             try:
                 records[i] = json.loads(records[i])   # now each record should be in json string format > parse into dicts
             except json.decoder.JSONDecodeError as e:
-                print("JSON Error at index {}: {}".format(i, e))
+                print("JSON Error at index {}: {}\n".format(i, e))
+                print("Erroneous parsed record at that index (inspect record for errors):\n{}\n".format(records[i]))
                 records[i] = {"Title": "JSON Error at index {}: {}".format(i, e), "Author": "json.decoder.jsonDecoderError"}
 
         # homogenize titles into .title() format
@@ -75,9 +79,9 @@ def import_bib(filename):
         for i in range(len(records)):
             records[i] = BibRecord(records[i])
             records[i].fix_authors()
-        
+
         return records
 
     except:
-        print('Parsing failed: empty/non-bib file or IO error in filename, "{}"'.format(filename))
+        print('Parsing failed: parsing error, empty/non-bib file or IO error in filename, "{}"'.format(filename))
         return []

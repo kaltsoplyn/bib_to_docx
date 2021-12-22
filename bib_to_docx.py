@@ -1,3 +1,4 @@
+import sys
 import docx
 from docx import Document
 from docx.shared import Pt, Cm
@@ -7,7 +8,14 @@ from bib_to_dict import BibToDictList, BibRecord
 
 # This script parses a bibliography export from WoK, into a docx file with list of bib entries.
 
-bib_in = BibToDictList('bib_in.bib')
+if (len(sys.argv) > 1):
+    filename = sys.argv[1]
+else: 
+    filename = 'bib_in.bib'
+
+print("Parsing file: {}\n".format(filename))
+
+bib_in = BibToDictList(filename)
 records = bib_in.records
 
 # function to gather info from one BibRecord -> returns a dict
@@ -116,4 +124,8 @@ for (index, rec) in enumerate(all_recs):
     build_entry(index, rec)
 
 # save the docx
-document.save('bib_out.docx')
+try:
+    document.save('bib_out.docx')
+    print("Presumably things worked as planned. Output file: 'bib_out.docx'")
+except Exception as e:
+    print("Exception occured with output file: {}".format(e))
