@@ -74,6 +74,13 @@ def import_bib(filename):
         for rec in records:
             rec['title'] = (re.sub(r'[ ]+', r' ', rec['title'])).title()   # remove excessive whitespace resulting from previously removing newlines
             rec['author'] = (re.sub(r'[ ]+', r' ', rec['author']))         # remove excessive whitespace resulting from previously removing newlines
+            try:
+                if 'gold' in rec['oa'].lower() or 'hybrid' in rec['oa'].lower() :
+                    rec['oa'] = 'gold'
+                elif 'green' in rec['oa'].lower() :
+                    rec['oa'] = 'green'
+            except:
+                rec['oa'] = ''
 
         # finally, convert all dicts in the list into BibRecord instances
         for i in range(len(records)):

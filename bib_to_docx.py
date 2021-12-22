@@ -4,6 +4,7 @@ from docx import Document
 from docx.shared import Pt, Cm
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.dml import MSO_THEME_COLOR_INDEX
+from docx.shared import RGBColor
 from bib_to_dict import BibToDictList, BibRecord
 
 # This script parses a bibliography export from WoK, into a docx file with list of bib entries.
@@ -29,7 +30,8 @@ def build_rec(rec):
                     + (", " + rec.get_tag('pages') ) \
                     + " (" + rec.get_tag('year') + ")",
         "doi": rec.get_tag('doi'),
-        "doi_url": "https://dx.doi.org/{}".format(rec.get_tag('doi'))
+        "doi_url": "https://dx.doi.org/{}".format(rec.get_tag('doi')),
+        "oa": rec.get_tag('oa')
     }
     return out
 
@@ -42,16 +44,26 @@ all_recs = [build_rec(rec) for rec in records]
 document = Document()
 document.add_heading('Bibliography', 0)
 
+Colors = {
+    "Gold": RGBColor(0xd4, 0xaf, 0x37),
+    "Green": RGBColor(0x22, 0xac, 0x00),
+    "Black": RGBColor(0x00, 0x00, 0x00),
+    "Gray": RGBColor(0xaa, 0xaa, 0xaa),
+    "Blue": RGBColor(0x00, 0x99, 0xcc)
+    }
+
 # function to define styles
 # USAGE: new_style( style name: string, font_size: int pt, kw:is_bold: bool, kwarg: is_italic: bool, kw: left_ind: float cm, kw: first_line_ind: float cm )
 # pretty self explanatory except: left_ind is left_indent = how much indent from the left in cm
 # the first_line_ind defines how much the first line is indented *RELATIVE* to the rest (aka relative to left_ind)
-def new_style( name, font_size, is_bold = False, is_italic = False, left_ind = 0.5, first_line_ind = 0, color = MSO_THEME_COLOR_INDEX.TEXT_1  ):
+def new_style( name, font_size, font_name = 'Calibri', is_bold = False, is_italic = False, left_ind = 0.5, first_line_ind = 0, color = Colors["Black"]  ):
     style = document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+    style.font.name = font_name
     style.font.bold = is_bold
     style.font.italic = is_italic
     style.font.size = Pt(font_size)
-    style.font.color.theme_color = color
+    # style.font.color.theme_color = color
+    style.font.color.rgb = color
     paragraph_format = style.paragraph_format
     paragraph_format.first_line_indent = Cm(first_line_ind)
     paragraph_format.left_indent = Cm(left_ind)
@@ -62,12 +74,15 @@ def new_style( name, font_size, is_bold = False, is_italic = False, left_ind = 0
 # define styles
 # the "DD" styles are defined with larger indents so that things align nicely when the index is > 10
 # I duplicated the whole style in code, because my attempt to copy or deepcopy the styles and change just the indent failed for some reason
-title_style = new_style('title_style', 13, is_bold=True, first_line_ind=-0.5, color = MSO_THEME_COLOR_INDEX.ACCENT_1 )
-title_styleDD = new_style('title_styleDD', 13, is_bold=True, left_ind=0.75, first_line_ind=-0.75, color = MSO_THEME_COLOR_INDEX.ACCENT_1 )
-authors_style = new_style('authors_style', 12, is_italic=True)
-authors_styleDD = new_style('authors_styleDD', 12, is_italic=True, left_ind=0.75)
+title_style = new_style('title_style', 11, is_bold=True, first_line_ind=-0.4 )
+title_styleDD = new_style('title_styleDD', 11, is_bold=True, left_ind=0.5, first_line_ind=-0.6 )
+authors_style = new_style('authors_style', 11, is_italic=True)
+authors_styleDD = new_style('authors_styleDD', 11, is_italic=True, left_ind=0.5)
 journal_style = new_style('journal_style', 11)
-journal_styleDD = new_style('journal_styleDD', 11, left_ind=0.75)
+journal_styleDD = new_style('journal_styleDD', 11, left_ind=0.5)
+OA_styleGold = new_style('OA_style_Gold', 11, font_name = 'Segoe UI Symbol', color = Colors["Gold"])
+OA_styleGreen = new_style('OA_style_Green', 11, font_name = 'Segoe UI Symbol', color = Colors["Green"])
+OA_styleGray = new_style('OA_style_Gray', 11, font_name = 'Segoe UI Symbol', color = Colors["Gray"])
 
 
 # copy-pasted function to add hyperlinks, as, strangely, there is no direct way through the API
@@ -95,7 +110,8 @@ def add_hyperlink(paragraph, text, url):
 
     # A workaround for the lack of a hyperlink style (doesn't go purple after using the link)
     # Delete this if using a template that has the hyperlink style in it
-    r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
+    #r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
+    r.font.color.rgb = Colors["Blue"]
     r.font.underline = True
 
     return hyperlink
@@ -105,7 +121,19 @@ def build_entry(index, r):
 
     title = document.add_paragraph()
     title.style = title_style if index + 1 < 10 else title_styleDD
-    title.add_run(str(index + 1) + ". " + r['title'])
+
+    title.add_run(str(index + 1) + ". " + r['title'] + "  ")
+    
+    if (r['oa'] == ''):
+        OAcolor = Colors["Gray"]
+        OAdecorator = '🔒'
+    else:
+        OAdecorator = '🔓'
+        OAcolor = Colors["Gold"] if r['oa'] == 'gold' else Colors["Green"]
+
+    OArun = title.add_run(OAdecorator)
+    OArun.font.color.rgb = OAcolor
+    OArun.font.name = 'Segoe UI Symbol'
 
     authors = document.add_paragraph()
     authors.style = authors_style if index + 1 < 10 else authors_styleDD

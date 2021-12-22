@@ -264,26 +264,6 @@ ORCID-Numbers = {{Kafesaki, Maria/0000-0002-9524-2576
 Unique-ID = {{WOS:000585195500003}},
 }
 
-@article{ WOS:000577329800030,
-Author = {Zannoni, Nora and Wikelski, Martin and Gagliardo, Anna and Raza, Atif
-   and Kramer, Stefan and Seghetti, Chiara and Wang, Nijing and Edtbauer,
-   Achim and Williams, Jonathan},
-Title = {{Identifying volatile organic compounds used for olfactory navigation by
-   homing pigeons}},
-Journal = {{SCIENTIFIC REPORTS}},
-Year = {{2020}},
-Volume = {{10}},
-Number = {{1}},
-Month = {{SEP 28}},
-DOI = {{10.1038/s41598-020-72525-2}},
-Article-Number = {{15879}},
-ISSN = {{2045-2322}},
-ORCID-Numbers = {{Edtbauer, Achim/0000-0001-8824-2132
-   Zannoni, Nora/0000-0003-2721-5362
-   Raza, Atif/0000-0003-1856-7286}},
-Unique-ID = {{WOS:000577329800030}},
-}
-
 @article{ WOS:000572431300001,
 Author = {Georgiladaki, S. and Isaakidis, D. and Spyros, A. and Tsikalas, G. K.
    and Katerinopoulos, H. E.},
